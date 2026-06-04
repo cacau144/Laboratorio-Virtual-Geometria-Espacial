@@ -1,2 +1,2 @@
 # Laboratorio-Virtual-Geometria-Espacial
-Plataforma que integra a simulacao dos postulados fundamentais da geometria espacial com algumas atividades. O ambiente foi desenhado para promover a transicao gradual da intuicao visual para a demonstracao formal.
+Plataforma que integra a simulação dos postulados fundamentais da Geometria Espacial com algumas atividades. O ambiente foi desenhado para promover a transição gradual da intuição visual para a demonstração formal.
