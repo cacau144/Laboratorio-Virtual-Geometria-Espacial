@@ -136,6 +136,26 @@
             border-radius: 12px;
             display: none;
         }
+
+        /* --- RODAPÉ DE IDENTIFICAÇÃO --- */
+        .footer-credit {
+            position: fixed;
+            bottom: 15px;
+            right: 20px;
+            text-align: right;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            pointer-events: auto; /* Garante que links sejam clicáveis */
+        }
+
+        .footer-credit a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .footer-credit a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -165,7 +185,8 @@
             <button class="btn-postulado" onclick="carregarPostulado(6)">
                 <h3>Postulado 5': Separação do Espaço</h3>
             </button>
-            
+
+                        
             <!-- NOVOS BOTÕES AQUI -->
             <button class="btn-postulado" onclick="window.location.href='exercicios_A.html'">
                 <h3 style="color: var(--text-main);">Exercícios A</h3>
@@ -177,6 +198,11 @@
                 <h3 style="color: var(--text-main);">Exercícios C</h3>
             </button>
         </div>
+    </div>
+
+    <div class="footer-credit">
+        <div>Ana Tavares</div>
+        <a href="mailto:cacautava@gmail.com">cacautava@gmail.com</a>
     </div>
 
     <div id="simulador-screen">
