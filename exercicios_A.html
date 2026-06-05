@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercícios - Laboratório de Geometria</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #38bdf8;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --success: #4ade80; 
+            --warning: #facc15;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- Interface Principal --- */
+        .header-top {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .btn-voltar-main {
+            background: transparent;
+            padding: 10px 15px;
+            color: var(--text-dim);
+            border: 1px solid #334155;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        h1 { color: var(--success); margin: 0 auto; transform: translateX(-45px); }
+
+        .bandeja-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .bandeja {
+            background: var(--card-bg);
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .conteudo-bandeja {
+            border: 2px dashed #334155;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .btn-animacao {
+            background: var(--accent);
+            color: #0f172a;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-animacao:hover { opacity: 0.9; }
+
+        /* --- TELA DE ANIMAÇÃO (OVERLAY) --- */
+        #tela-animacao {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: var(--bg-color);
+            z-index: 1000;
+            flex-direction: column;
+        }
+
+        #canvas-container {
+            flex-grow: 1;
+            width: 100%;
+            height: 100%;
+        }
+
+        .controles-anim {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1010;
+        }
+
+        .btn-controle {
+            background: #334155;
+            color: white;
+            border: 1px solid #475569;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-controle:hover { background: #475569; }
+
+        .btn-resposta {
+            background: var(--success);
+            color: #0f172a;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        #legenda-anim {
+            position: absolute;
+            bottom: 30px;
+            width: 100%;
+            text-align: center;
+            color: var(--text-main);
+            font-size: 1.2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
+            pointer-events: none;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        /* Modal de Resposta */
+        #modal-resposta {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            color: #0f172a;
+            padding: 25px 40px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            z-index: 1020;
+            font-weight: bold;
+            text-align: left;
+            max-width: 500px;
+        }
+        
+        #modal-resposta button {
+            margin-top: 15px;
+            background: var(--bg-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-top">
+        <a href="index_main.html" class="btn-voltar-main">← Voltar ao Laboratório</a>
+        <h1>Exercícios de Geometria do bloco A</h1>
+    </div>
+
+    <div class="bandeja-container">
+        <div class="bandeja">
+            <div>
+                <h2>Exercício 1</h2>
+                <div class="conteudo-bandeja">
+                  <p>
+                    <strong> Passo 1: </strong> Trace uma reta r passando por dois pontos distintos A e B;<br>
+                    <strong> Passo 2: </strong> Fixe um ponto C não colinear à reta r; <br>
+                    <strong> Passo 3: </strong> Determine o plano &alpha; que contenha A, B e C; <br>
+                    <strong> Passo 4: </strong> Trace o ponto D fora do plano &alpha; <br>
+                    <strong> Passo 5: </strong> Construa todos os possíveis planos que contenham três destes pontos; <br>
+                    <strong> Quantos planos distintos puderam ser construídos? </strong>
+                  </p>
+                </div>
+            </div>
+            <button class="btn-animacao" onclick="abrirAnimacao(1)">Ver Animação</button>
+        </div>
+
+        <div class="bandeja">
+            <div>
+                <h2>Exercício 2</h2>
+                <div class="conteudo-bandeja">
+                    <p>
+                        Sejam <strong>r</strong> e <strong>s</strong> duas retas reversas, <strong>A</strong> um ponto em <strong>r</strong> e <strong>B</strong> um ponto em <strong>s</strong>.<br><br>
+                        <strong>Passo 1:</strong> Identificar as retas reversas r, s e os pontos A e B;<br>
+                        <strong>Passo 2:</strong> Construir o plano &alpha; definido por r e B;<br>
+                        <strong>Passo 3:</strong> Construir o plano &beta; definido por s e A;<br>
+                        <strong>Passo 4:</strong> Identificar a interseção geométrica entre os dois planos.<br><br>
+                        <strong>Qual é a interseção do plano &alpha; com o plano &beta;?</strong>
+                    </p>
+                </div>
+            </div>
+            <button class="btn-animacao" onclick="abrirAnimacao(2)">Ver Animação</button>
+        </div>
+    </div>
+
+    <div id="tela-animacao">
+        <div class="controles-anim">
+            <button class="btn-controle" onclick="fecharAnimacao()">← Voltar aos Exercícios</button>
+            <button class="btn-controle" onclick="reiniciarAnimacao()">Rever Animação</button>
+            <button class="btn-resposta" onclick="mostrarResposta()">Resposta</button>
+        </div>
+
+        <div id="modal-resposta" style="text-align: left;">
+            <p id="texto-resposta"></p>
+            <button onclick="document.getElementById('modal-resposta').style.display='none'">Fechar</button>
+        </div>
+
+        <div id="legenda-anim"></div>
+        <div id="canvas-container"></div>
+    </div>
+
+    <script>
+        let scene, camera, renderer, controls, currentAnimId;
+        let fase = 0, startTime = 0;
+        let objetosCena = [];
+        let exercicioAtual = 1;
+
+        function abrirAnimacao(id) {
+            exercicioAtual = id;
+            document.getElementById('tela-animacao').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            
+            initThree();
+            reiniciarAnimacao();
+            
+            cancelAnimationFrame(currentAnimId); 
+            animate();
+        }
+
+        function fecharAnimacao() {
+            document.getElementById('tela-animacao').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            cancelAnimationFrame(currentAnimId);
+            limparCena();
+        }
+
+        function mostrarResposta() {
+            const modal = document.getElementById('modal-resposta');
+            const texto = document.getElementById('texto-resposta');
+    
+            if (exercicioAtual === 1) {
+                texto.innerHTML = "<strong>Resposta:</strong> 4 planos distintos.";
+            } else if (exercicioAtual === 2) {
+                texto.innerHTML = "<strong>Resposta:</strong> A interseção é a reta AB.<br><br>" +
+                          "<strong>Justificativa:</strong><br><br>" +
+                          "• Como A pertence a r, e r está contida em &alpha;, o ponto A pertence a &alpha;.<br>" +
+                          "• Como A também define o plano &beta;, o ponto A pertence a &beta;.<br>" +
+                          "• Aplicando o mesmo raciocínio ao ponto B, temos que B pertence a &alpha; e a &beta;.<br>" +
+                          "• Como dois pontos distintos pertencem simultaneamente a ambos os planos, " +
+                          "a interseção é, necessariamente, a reta definida por eles.";
+    }
+    
+    modal.style.display = 'block';
+}
+        
+
+        function limparCena() {
+            objetosCena.forEach(obj => scene.remove(obj));
+            objetosCena = [];
+        }
+
+        function reiniciarAnimacao() {
+            limparCena();
+            fase = 0;
+            startTime = Date.now();
+            controls.enabled = false;
+            camera.position.set(6, 6, 10);
+            document.getElementById('modal-resposta').style.display = 'none';
+            document.getElementById('legenda-anim').innerHTML = ""; 
+        }
+
+        function initThree() {
+            const container = document.getElementById('canvas-container');
+            if (renderer) return;
+
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            scene.add(new THREE.GridHelper(20, 20, 0x334155, 0x1e293b));
+        }
+
+        function animate() {
+            currentAnimId = requestAnimationFrame(animate);
+            const elapsed = (Date.now() - startTime) / 1000;
+            const legenda = document.getElementById('legenda-anim');
+
+            if (exercicioAtual === 1) {
+                // --- LÓGICA DO EXERCÍCIO 1 ---
+                if (fase === 0 && elapsed > 1) {
+                    adicionarReta(-10, 0, 0, 10, 0, 0, 0x94a3b8);
+                    criarLabel('r', -9, 0.5, 0, '#94a3b8');
+                    adicionarPonto(-2, 0, 0, 0x38bdf8, 'A');
+                    adicionarPonto(2, 0, 0, 0x38bdf8, 'B');
+                    
+                    legenda.innerHTML = "<span style='color: #38bdf8; font-weight: bold;'>1.</span> Traçamos a reta r pelos pontos A e B";
+                    fase = 1;
+                }
+                if (fase === 1 && elapsed > 4) {
+                    adicionarPonto(0, 0, 3, 0x4ade80, 'C');
+                    legenda.innerHTML = "<span style='color: #4ade80; font-weight: bold;'>2.</span> Adicionamos o ponto C fora da reta";
+                    fase = 2;
+                }
+                if (fase === 2 && elapsed > 7) {
+                    adicionarPlano([-2,0,0], [2,0,0], [0,0,3], 0x38bdf8);
+                    legenda.innerHTML = "<span style='color: #38bdf8; font-weight: bold;'>3.</span> O plano &alpha; contém A, B e C";
+                    fase = 3;
+                }
+                if (fase === 3 && elapsed > 10) {
+                    adicionarPonto(0, 4, 1, 0xfacc15, 'D');
+                    legenda.innerHTML = "<span style='color: #facc15; font-weight: bold;'>4.</span> Ponto D fora do plano";
+                    fase = 4;
+                }
+                if (fase === 4 && elapsed > 13) {
+                    adicionarPlano([-2,0,0], [2,0,0], [0,4,1], 0xec4899); 
+                    adicionarPlano([-2,0,0], [0,0,3], [0,4,1], 0xa855f7); 
+                    adicionarPlano([2,0,0], [0,0,3], [0,4,1], 0xf97316);  
+                    legenda.innerHTML = "<span style='color: #4ade80; font-weight: bold;'>5.</span> Todos os possíveis planos são formados. Gire a câmera para explorar!";
+                    controls.enabled = true;
+                    fase = 5;
+                }
+            } else if (exercicioAtual === 2) {
+                // --- LÓGICA DO EXERCÍCIO 2 ---
+                if (fase === 0 && elapsed > 1) {
+                    // Reta r (elevada para y=4 para ficar clara)
+                    adicionarReta(-6, 4, 1, 6, 4, 1, 0x38bdf8);
+                    criarLabel('r', -5, 4.5, 1, '#38bdf8');
+                    adicionarPonto(-1, 4, 1, 0x38bdf8, 'A'); 
+                    
+                    // Reta s (elevada para y=1 para ficar acima da grade e visível)
+                    adicionarReta(2, 1, -6, 2, 1, 6, 0x4ade80);
+                    criarLabel('s', 2, 1.5, -5, '#4ade80');
+                    adicionarPonto(2, 1, 2, 0x4ade80, 'B'); 
+                    
+                    legenda.innerHTML = "1. Temos duas retas <span style='color:#38bdf8; font-weight:bold;'>reversas r (azul)</span> e <span style='color:#4ade80; font-weight:bold;'>s (verde)</span>, com <span style='color:#38bdf8; font-weight:bold;'>A &isin; r</span> e <span style='color:#4ade80; font-weight:bold;'>B &isin; s</span>.";
+                    fase = 1;
+                }
+                if (fase === 1 && elapsed > 5) {
+                    // Plano Alpha definido por r e B
+                    adicionarPlano([-6, 4, 1], [6, 4, 1], [2, 1, 2], 0x38bdf8, 0.4);
+                    legenda.innerHTML = "2. Construímos o <span style='color:#38bdf8; font-weight:bold;'>plano &alpha;</span>, definido pela reta r e o ponto B.";
+                    fase = 2;
+                }
+                if (fase === 2 && elapsed > 9) {
+                    // Plano Beta definido por s e A
+                    adicionarPlano([2, 1, -6], [2, 1, 6], [-1, 4, 1], 0x4ade80, 0.4);
+                    legenda.innerHTML = "3. Construímos o <span style='color:#4ade80; font-weight:bold;'>plano &beta;</span>, definido pela reta s e o ponto A.";
+                    fase = 3;
+                }
+                if (fase === 3 && elapsed > 13) {
+                    // Reta resultante da interseção
+                    adicionarReta(-7, 10, -1, 8, -5, 4, 0xfacc15); 
+                    
+                    // Destaca os pontos de ancoragem da interseção e recria as labels
+                    adicionarPonto(-1, 4, 1, 0xfacc15, 'A'); 
+                    adicionarPonto(2, 1, 2, 0xfacc15, 'B'); 
+
+                    legenda.innerHTML = "4. A interseção de &alpha; e &beta; é a <span style='color:#facc15; font-weight:bold;'>reta AB (amarela)</span>! Gire o cenário tridimensional.";
+                    controls.enabled = true;
+                    fase = 4;
+                }
+            }
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        /* --- Funções Auxiliares de Geometria --- */
+        
+        // Nova função para criar os textos flutuantes
+        function criarLabel(texto, x, y, z, corTextHex) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128;
+            canvas.height = 128;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.font = 'bold 50px Arial';
+            ctx.fillStyle = corTextHex;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = "rgba(0,0,0,0.8)";
+            ctx.shadowBlur = 4;
+            ctx.fillText(texto, 64, 64);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            const material = new THREE.SpriteMaterial({ map: texture, depthTest: false });
+            const sprite = new THREE.Sprite(material);
+            
+            sprite.position.set(x, y, z);
+            sprite.scale.set(1.5, 1.5, 1.5);
+            sprite.renderOrder = 999; 
+            
+            scene.add(sprite);
+            objetosCena.push(sprite);
+        }
+
+        function adicionarPonto(x, y, z, cor, nome = '') {
+            const p = new THREE.Mesh(new THREE.SphereGeometry(0.18), new THREE.MeshBasicMaterial({color: cor}));
+            p.position.set(x, y, z);
+            scene.add(p);
+            objetosCena.push(p);
+
+            if (nome !== '') {
+                const hexColor = '#' + cor.toString(16).padStart(6, '0');
+                criarLabel(nome, x, y + 0.5, z, hexColor);
+            }
+        }
+
+        function adicionarReta(x1, y1, z1, x2, y2, z2, cor = 0x94a3b8) {
+            const mat = new THREE.LineBasicMaterial({color: cor, linewidth: 2});
+            const geo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(x1,y1,z1), new THREE.Vector3(x2,y2,z2)]);
+            const line = new THREE.Line(geo, mat);
+            scene.add(line);
+            objetosCena.push(line);
+        }
+
+        function adicionarPlano(p1, p2, p3, cor, opacidade = 0.5) {
+            const geom = new THREE.BufferGeometry();
+            const vertices = new Float32Array([...p1, ...p2, ...p3]);
+            geom.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+            const mat = new THREE.MeshBasicMaterial({color: cor, side: THREE.DoubleSide, transparent: true, opacity: opacidade, depthWrite: false});
+            const mesh = new THREE.Mesh(geom, mat);
+            scene.add(mesh);
+            objetosCena.push(mesh);
+        }
+
+        window.addEventListener('resize', () => {
+            if (camera) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        });
+    </script>
+</body>
+</html>

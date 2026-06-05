@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratório Virtual de Geometria Espacial</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #38bdf8;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --success: #4ade80;
+            --warning: #facc15;
+            --purple: #818cf8;
+            --danger: #f87171;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* --- TELA INICIAL --- */
+        #hub-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .header-main { text-align: center; margin-bottom: 40px; }
+        .header-main h1 { font-size: 2.5rem; color: var(--text-main); margin-bottom: 10px; }
+        .header-main p { color: var(--text-dim); font-size: 1.1rem; }
+
+        .grid-postulados {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            width: 100%;
+        }
+
+        .btn-postulado {
+            background: var(--card-bg);
+            border: 1px solid #334155;
+            padding: 25px;
+            border-radius: 16px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-postulado:hover {
+            border-color: var(--accent);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .btn-postulado h3 { margin: 0; color: var(--accent); font-size: 1.2rem; }
+        .btn-postulado p { margin: 0; color: var(--text-dim); font-size: 0.9rem; line-height: 1.4; }
+
+        /* --- TELA DO SIMULADOR --- */
+        #simulador-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .nav-bar {
+            width: 90vw;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .btn-voltar, .btn-reset {
+            background: transparent;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .btn-voltar {
+            color: var(--text-dim);
+            border: 1px solid #334155;
+        }
+
+        .btn-voltar:hover { background: #334155; color: white; }
+
+        .btn-reset {
+            color: var(--accent);
+            border: 1px solid var(--accent);
+        }
+
+        .btn-reset:hover {
+            background: var(--accent);
+            color: var(--bg-color);
+        }
+
+        #canvas-container {
+            width: 90vw;
+            height: 60vh;
+            background: #020617;
+            border-radius: 16px;
+            border: 1px solid #334155;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        canvas { max-width: 100%; max-height: 100%; outline: none; }
+
+        .controles-inferiores {
+            margin-top: 20px;
+            width: 80%;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="hub-screen">
+        <div class="header-main">
+            <h1>Laboratório Virtual de Geometria Espacial</h1>
+            <p>Explore os fundamentos do espaço</p>
+        </div>
+
+        <div class="grid-postulados">
+            <button class="btn-postulado" onclick="carregarPostulado(1)">  
+                <h3>Postulado 1: Determinação (Reta)</h3>
+            </button>
+            <button class="btn-postulado" onclick="carregarPostulado(2)">
+                <h3>Postulado 2: Existência (Reta)</h3>
+            </button>
+            <button class="btn-postulado" onclick="carregarPostulado(3)">
+                <h3>Postulado 3: Determinação (Plano)</h3>
+            </button>
+            <button class="btn-postulado" onclick="carregarPostulado(4)">
+                <h3>Postulado 4: Existência (Plano)</h3>
+            </button>
+            <button class="btn-postulado" onclick="carregarPostulado(5)">
+                <h3>Postulado 5: Intersecção</h3>
+            </button>
+            <button class="btn-postulado" onclick="carregarPostulado(6)">
+                <h3>Postulado 5': Separação do Espaço</h3>
+            </button>
+            
+            <!-- NOVOS BOTÕES AQUI -->
+            <button class="btn-postulado" onclick="window.location.href='exercicios_A.html'">
+                <h3 style="color: var(--text-main);">Exercícios A</h3>
+            </button>
+            <button class="btn-postulado" onclick="window.location.href='exercicios_B.html'">
+                <h3 style="color: var(--text-main);">Exercícios B</h3>
+            </button>
+            <button class="btn-postulado" onclick="window.location.href='exercicios_C.html'">
+                <h3 style="color: var(--text-main);">Exercícios C</h3>
+            </button>
+        </div>
+    </div>
+
+    <div id="simulador-screen">
+        <div class="nav-bar">
+            <button class="btn-voltar" onclick="voltarAoHub()">← Voltar ao Menu</button>
+            <button class="btn-reset" onclick="reiniciarPostulado()">↻ Reiniciar Animação</button>
+        </div>
+        <h2 id="titulo-postulado"></h2>
+        <div id="status-txt" style="color: var(--accent); margin-bottom: 10px; font-weight: bold; text-align: center; max-width: 800px;"></div>
+        
+        <div id="canvas-container"></div>
+        <div id="controles-custom" class="controles-inferiores"></div>
+    </div>
+
+    <script type="importmap">
+        { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+    </script>
+
+    <script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+
+const hub = document.getElementById('hub-screen');
+const sim = document.getElementById('simulador-screen');
+const container = document.getElementById('canvas-container');
+const titulo = document.getElementById('titulo-postulado');
+const status = document.getElementById('status-txt');
+
+let currentAnimId = null;
+let currentPostuladoId = null;
+
+window.carregarPostulado = function(id) {
+    currentPostuladoId = id;
+    hub.style.display = 'none';
+    sim.style.display = 'flex';
+    limparEscena();
+    
+    switch(id) {
+        case 1: iniciarPostulado1(); break;
+        case 2: iniciarPostulado2(); break;
+        case 3: iniciarPostulado3(); break;
+        case 4: iniciarPostulado4(); break;
+        case 5: iniciarPostulado5(); break;
+        case 6: iniciarPostulado6(); break;
+        default: 
+            container.innerHTML = "<p style='padding:20px'>Módulo em construção...</p>";
+    }
+}
+
+window.reiniciarPostulado = function() {
+    if (currentPostuladoId) {
+        carregarPostulado(currentPostuladoId);
+    }
+}
+
+function limparEscena() {
+    container.innerHTML = ''; 
+    if(currentAnimId) {
+        clearTimeout(currentAnimId);
+        cancelAnimationFrame(currentAnimId);
+    }
+    window.onmousemove = null;
+    window.onmouseup = null;
+    window.onmousedown = null;
+}
+
+window.voltarAoHub = function() {
+    limparEscena();
+    sim.style.display = 'none';
+    hub.style.display = 'flex';
+    currentPostuladoId = null;
+}
+ 
+// --- POSTULADO 1 (A Reta) ---
+function iniciarPostulado1() {
+    titulo.innerHTML = "Postulado 1 <br> Por dois pontos do espaço passa uma e somente uma reta.";
+    titulo.style.textAlign = "center";
+    titulo.style.display = "block";
+    titulo.style.width = "1200px";
+    titulo.style.margin = "0 auto";
+    titulo.style.padding = "10px";
+      
+    status.innerText = "1. Por um único ponto A, passam infinitas retas.";
+    
+    const canvas = document.createElement('canvas');
+    canvas.width = 800; canvas.height = 450;
+    container.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+
+    const pontoA = { x: 250, y: 225 };
+    const pontoB = { x: 550, y: 175 };
+    let anguloAtual = 0;
+    const anguloMaximo = Math.PI;
+    const passoAngulo = Math.PI / 40;
+    let fase = 1;
+
+    function desenharPonto(x, y, rotulo, cor = "#38bdf8") {
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = cor;
+        ctx.fill();
+        ctx.shadowBlur = 10; ctx.shadowColor = cor;
+        ctx.font = 'bold 20px Segoe UI';
+        ctx.fillStyle = "#fff";
+        ctx.fillText(rotulo, x + 15, y - 10);
+        ctx.shadowBlur = 0;
+    }
+
+    function desenharReta(p, angulo, cor, espessura) {
+        const raio = 1000;
+        ctx.beginPath();
+        ctx.moveTo(p.x + raio * Math.cos(angulo), p.y + raio * Math.sin(angulo));
+        ctx.lineTo(p.x - raio * Math.cos(angulo), p.y - raio * Math.sin(angulo));
+        ctx.strokeStyle = cor;
+        ctx.lineWidth = espessura;
+        ctx.stroke();
+    }
+
+    function animar() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (let a = 0; a <= anguloAtual; a += passoAngulo) {
+            desenharReta(pontoA, a, 'rgba(56, 189, 248, 0.15)', 1);
+        }
+        desenharPonto(pontoA.x, pontoA.y, 'A');
+
+        if (fase === 1) {
+            anguloAtual += passoAngulo;
+            if (anguloAtual >= anguloMaximo) {
+                fase = 2;
+                status.innerText = "2. Mas se definirmos um segundo ponto B...";
+                currentAnimId = setTimeout(animar, 1500);
+                return;
+            }
+        }
+
+        if (fase >= 2) {
+            desenharPonto(pontoB.x, pontoB.y, 'B', '#4ade80');
+            if(fase === 2) {
+                fase = 3;
+                currentAnimId = setTimeout(animar, 1000);
+                return;
+            }
+        }
+
+        if (fase === 3) {
+            status.innerText = "3. ...apenas UMA reta consegue passar por ambos.";
+            const angAB = Math.atan2(pontoB.y - pontoA.y, pontoB.x - pontoA.x);
+            desenharReta(pontoA, angAB, '#38bdf8', 4);
+            desenharPonto(pontoA.x, pontoA.y, 'A');
+            desenharPonto(pontoB.x, pontoB.y, 'B', '#4ade80');
+            return;
+        }
+
+        currentAnimId = setTimeout(animar, 60);
+    }
+    animar();
+}
+
+// --- POSTULADO 2 (Existência) ---
+function iniciarPostulado2() {
+    titulo.innerHTML = "Postulado 2 <br> Dada uma reta do espaço, existem pontos que pertencem à reta e pontos que não pertencem à reta.";
+    titulo.style.textAlign = "center";
+    titulo.style.display = "block";
+    titulo.style.width = "1200px";
+    titulo.style.margin = "0 auto";
+    titulo.style.padding = "10px";
+   
+    status.innerText = "Observe os pontos surgindo em relação à reta r.";
+    const canvas = document.createElement('canvas');
+    canvas.width = 800; canvas.height = 450;
+    container.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    
+    let pontos = [];
+    function animar() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath(); ctx.moveTo(100, 225); ctx.lineTo(700, 225);
+        ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2; ctx.stroke();
+        ctx.fillStyle = "#fff"; ctx.fillText("reta r", 710, 230);
+
+        if (pontos.length < 15 && Math.random() > 0.80) {
+            const pertence = Math.random() > 0.5;
+            pontos.push({ x: 150 + Math.random() * 500, y: pertence ? 225 : 100 + Math.random() * 250, p: pertence });
+        }
+
+        pontos.forEach(pt => {
+            ctx.beginPath(); ctx.arc(pt.x, pt.y, 5, 0, Math.PI * 2);
+            ctx.fillStyle = pt.p ? "#38bdf8" : "#f87171"; ctx.fill();
+            ctx.font = "12px Arial"; ctx.fillStyle = "#fff";
+            ctx.fillText(pt.p ? "Pertence" : "Não pertence", pt.x + 10, pt.y - 10);
+        });
+        currentAnimId = setTimeout(animar, 100);
+    }
+    animar();
+}
+
+// --- POSTULADO 3 (Plano Interativo) ---
+function iniciarPostulado3() {
+    titulo.innerHTML = "Postulado 3 <br> Por três pontos do espaço não situados na mesma reta passa um e somente um plano.";
+    titulo.style.textAlign = "center";
+    titulo.style.display = "block";
+    titulo.style.width = "1200px";
+    titulo.style.margin = "0 auto";
+    titulo.style.padding = "10px";
+      
+    status.innerText = "Preparando espaço geométrico...";
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    container.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enabled = false;
+
+    const coords = [
+        new THREE.Vector3(-2, 0, 0),
+        new THREE.Vector3(2, 0, 0),
+        new THREE.Vector3(0, 2.5, 1)   
+    ];
+
+    const materialPonto = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+    const geoPonto = new THREE.SphereGeometry(0.15);
+
+    const lineMat = new THREE.LineBasicMaterial({ color: 0x94a3b8, transparent: true, opacity: 0 });
+    const lineGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-10, 0, 0), new THREE.Vector3(10, 0, 0)]);
+    const retaEixo = new THREE.Line(lineGeo, lineMat);
+    scene.add(retaEixo);
+
+    const planeGeo = new THREE.PlaneGeometry(8, 8);
+    const planeMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide, transparent: true, opacity: 0 });
+    const planeMesh = new THREE.Mesh(planeGeo, planeMat);
+    scene.add(planeMesh);
+
+    scene.add(new THREE.GridHelper(20, 20, 0x334155, 0x1e293b));
+    camera.position.set(5, 5, 5);
+
+    let fase = 0;
+    let startTime = Date.now();
+
+    function render() {
+        currentAnimId = requestAnimationFrame(render);
+        const elapsed = (Date.now() - startTime) / 1000;
+
+        if (fase === 0 && elapsed > 1) {
+            const pA = new THREE.Mesh(geoPonto, materialPonto);
+            pA.position.copy(coords[0]);
+            scene.add(pA);
+            status.innerText = "1. Começamos com um ponto A...";
+            fase = 1;
+        }
+
+        if (fase === 1 && elapsed > 3) {
+            const pB = new THREE.Mesh(geoPonto, materialPonto);
+            pB.position.copy(coords[1]);
+            scene.add(pB);
+            status.innerText = "2. Adicionamos um ponto B...";
+            fase = 2;
+        }
+
+        if (fase === 2 && elapsed > 5) {
+            lineMat.opacity = 1;
+            status.innerText = "3. Dois pontos determinam uma reta única.";
+            fase = 3;
+        }
+
+        if (fase === 3 && elapsed > 7) {
+            planeMat.opacity = 0.2;
+            planeMesh.rotation.x = elapsed * 2;
+            status.innerText = "4. Por uma reta, passam infinitos planos.";
+            if (elapsed > 11) fase = 4;
+        }
+
+        if (fase === 4) {
+            const pC = new THREE.Mesh(geoPonto, new THREE.MeshBasicMaterial({ color: 0x4ade80 }));
+            pC.position.copy(coords[2]);
+            scene.add(pC);
+            const v1 = new THREE.Vector3().subVectors(coords[1], coords[0]);
+            const v2 = new THREE.Vector3().subVectors(coords[2], coords[0]);
+            const normal = new THREE.Vector3().crossVectors(v1, v2).normalize();
+            planeMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
+            planeMat.opacity = 0.4;
+            status.innerText = "5. O ponto C determina um ÚNICO plano. Tente girar a câmera!";
+            controls.enabled = true;
+            fase = 5;
+        }
+
+        controls.update();
+        renderer.render(scene, camera);
+    }
+    render();
+}
+
+// --- POSTULADO 4 (O Plano) ---
+function iniciarPostulado4() {
+    titulo.innerHTML = "Postulado 4 <br> Dado um plano do espaço, existem pontos que pertencem ao plano e pontos que não pertencem ao plano.";
+    titulo.style.textAlign = "center";
+    titulo.style.display = "block";
+    titulo.style.width = "1200px";
+    titulo.style.margin = "0 auto";
+    titulo.style.padding = "10px";
+   
+    status.innerText = "Arraste para rotacionar o plano. Pontos surgem continuamente.";
+    
+    const canvas = document.createElement('canvas');
+    canvas.width = 800; canvas.height = 450;
+    container.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    
+    let pontos = [];
+    let anguloX = 0.5;
+    let anguloY = 0.5;
+    let arrastando = false;
+    let lastMouseX, lastMouseY;
+
+    canvas.onmousedown = (e) => {
+        arrastando = true;
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
+    };
+    window.onmouseup = () => arrastando = false;
+    window.onmousemove = (e) => {
+        if (arrastando) {
+            anguloY += (e.clientX - lastMouseX) * 0.01;
+            anguloX += (e.clientY - lastMouseY) * 0.01;
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+        }
+    };
+
+    function projetar(x, y, z) {
+        let y1 = y * Math.cos(anguloX) - z * Math.sin(anguloX);
+        let z1 = y * Math.sin(anguloX) + z * Math.cos(anguloX);
+        let x1 = x * Math.cos(anguloY) + z1 * Math.sin(anguloY);
+        let z2 = -x * Math.sin(anguloY) + z1 * Math.cos(anguloY);
+        let escala = 400 / (400 + z2);
+        return {
+            x: x1 * escala + canvas.width / 2,
+            y: y1 * escala + canvas.height / 2,
+            visivel: z2 > -300
+        };
+    }
+
+    function animar() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (pontos.length < 25 && Math.random() > 0.90) {
+            const pertence = Math.random() > 0.5;
+            pontos.push({
+                lx: (Math.random() - 0.5) * 400,
+                ly: pertence ? 0 : (Math.random() - 0.5) * 400,
+                lz: (Math.random() - 0.5) * 400,
+                p: pertence
+            });
+        }
+
+        const v = [
+            projetar(-200, 0, -200), projetar(200, 0, -200),
+            projetar(200, 0, 200), projetar(-200, 0, 200)
+        ];
+
+        ctx.beginPath();
+        ctx.moveTo(v[0].x, v[0].y);
+        v.forEach(p => ctx.lineTo(p.x, p.y));
+        ctx.closePath();
+        ctx.strokeStyle = '#64748b';
+        ctx.fillStyle = "rgba(148, 163, 184, 0.2)";
+        ctx.fill();
+        ctx.stroke();
+
+        pontos.forEach(pt => {
+            const proj = projetar(pt.lx, pt.ly, pt.lz);
+            if (proj.visivel) {
+                ctx.beginPath();
+                ctx.arc(proj.x, proj.y, 4, 0, Math.PI * 2);
+                ctx.fillStyle = pt.p ? "#38bdf8" : "#f87171";
+                ctx.fill();
+                ctx.font = "10px Arial";
+                ctx.fillStyle = "#cbd5e1";
+                ctx.fillText(pt.p ? "No plano" : "Fora", proj.x + 8, proj.y - 5);
+            }
+        });
+
+        ctx.fillStyle = "#94a3b8";
+        ctx.fillText("Use o mouse para girar o espaço", 20, 430);
+        currentAnimId = requestAnimationFrame(animar);
+    }
+    animar();
+}
+
+// --- POSTULADO 5 (Intersecção de Planos) ---
+function iniciarPostulado5() {
+    titulo.innerHTML = "Postulado 5 <br> Se dois planos possuem um ponto em comum então eles possuem pelo menos mais um ponto em comum (e portanto, pelo menos uma reta em comum).";
+    titulo.style.textAlign = "center";
+    titulo.style.display = "block";
+    titulo.style.width = "1200px";
+    titulo.style.margin = "0 auto";
+    titulo.style.padding = "10px";
+   
+    status.innerText = "Preparando espaço geométrico...";
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    container.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enabled = false;
+
+    scene.add(new THREE.GridHelper(20, 20, 0x334155, 0x1e293b));
+    camera.position.set(6, 6, 6);
+    camera.lookAt(0, 0, 0);
+
+    const planeGeo = new THREE.PlaneGeometry(12, 12);
+    const geoPonto = new THREE.SphereGeometry(0.15, 32, 32);
+
+    const matPlaneAlpha = new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide, transparent: true, opacity: 0 });
+    const matPlaneBeta = new THREE.MeshBasicMaterial({ color: 0x818cf8, side: THREE.DoubleSide, transparent: true, opacity: 0 });
+    const matPonto = new THREE.MeshBasicMaterial({ color: 0x4ade80 });
+    const matRetaR = new THREE.LineBasicMaterial({ color: 0x67e8f9, transparent: true, opacity: 0 });
+    const matRetaIntersec = new THREE.LineBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0}); 
+
+    const planoAlpha = new THREE.Mesh(planeGeo, matPlaneAlpha);
+    planoAlpha.rotation.x = -Math.PI / 2;
+    scene.add(planoAlpha);
+
+    const pontoA = new THREE.Mesh(geoPonto, matPonto);
+    pontoA.position.set(2, 0, 0);
+    pontoA.visible = false;
+    scene.add(pontoA);
+
+    const pontosRetaR = [new THREE.Vector3(-6, 3, -3), new THREE.Vector3(6, 3, -3)];
+    const retaR = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pontosRetaR), matRetaR);
+    scene.add(retaR);
+
+    const planoBeta = new THREE.Mesh(planeGeo, matPlaneBeta);
+    planoBeta.rotation.x = -Math.PI / 4;
+    scene.add(planoBeta);
+
+    const pontoB = new THREE.Mesh(geoPonto, matPonto);
+    pontoB.position.set(-2, 0, 0);
+    pontoB.visible = false;
+    scene.add(pontoB);
+    
+    const pontosIntersec = [new THREE.Vector3(-8, 0, 0), new THREE.Vector3(8, 0, 0)];
+    const retaIntersec = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pontosIntersec), matRetaIntersec);
+    scene.add(retaIntersec);
+
+    let fase = 0;
+    let startTime = Date.now();
+
+    function render() {
+        currentAnimId = requestAnimationFrame(render);
+        const elapsed = (Date.now() - startTime) / 1000;
+
+        if (fase === 0 && elapsed > 0.5) {
+            matPlaneAlpha.opacity = 0.3;
+            status.innerText = "1. Considere um plano inicial α...";
+            fase = 1;
+        }
+        if (fase === 1 && elapsed > 2.0) {
+            pontoA.visible = true;
+            status.innerText = "2. Escolhemos um ponto A pertencente a este plano.";
+            fase = 2;
+        }
+        if (fase === 2 && elapsed > 4.0) {
+            matRetaR.opacity = 1;
+            status.innerText = "3. Desenhamos uma reta r fora do plano α.";
+            fase = 3;
+        }
+        if (fase === 3 && elapsed > 7.0) {
+            matPlaneBeta.opacity = 0.3;
+            status.innerText = "4. A reta r e o ponto A determinam um segundo plano β, secante a α.";
+            fase = 4;
+            retaR.visible = true;
+        }
+        if (fase === 4 && elapsed > 12.0) {
+            pontoB.visible = true;
+            status.innerText = "5. Como eles se tocam em A, devem compartilhar pelo menos um ponto B...";
+            fase = 5;
+        }
+        if (fase === 5 && elapsed > 15.0) {
+            matRetaIntersec.opacity = 1;
+            status.innerText = "6. ...formando assim uma reta de intersecção. Arraste para girar a visualização!";
+            controls.enabled = true;
+            retaR.visible = false;
+            fase = 6;
+        }
+
+        controls.update();
+        renderer.render(scene, camera);
+    }
+    render();
+}
+
+// --- POSTULADO 6 (Separação do Espaço) ---
+function iniciarPostulado6() {
+    titulo.innerHTML = "Postulado 5' <br> Um plano divide os pontos que lhe são exteriores em dois subconjuntos, chamados semi-espaços, de forma que um segmento com extremos no mesmo semi-espaço não corta o plano e um segmento com extremos em semi-espaços diferentes corta o plano.";
+    titulo.style.textAlign = "center";
+    titulo.style.display = "block";
+    titulo.style.width = "1200px";
+    titulo.style.margin = "0 auto";
+    titulo.style.padding = "10px";
+
+    status.innerText = "Preparando o universo geométrico...";
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    container.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enabled = false;
+
+    scene.add(new THREE.GridHelper(20, 20, 0x334155, 0x1e293b));
+    camera.position.set(10, 5, 10);
+    camera.lookAt(0, 0, 0);
+
+    const geoPonto = new THREE.SphereGeometry(0.2, 16, 16);
+    const matPontoComum = new THREE.MeshBasicMaterial({ color: 0x94a3b8 });
+    const matPontoPlano = new THREE.MeshBasicMaterial({ color: 0xfacc15 });
+    const matPontoAB = new THREE.MeshBasicMaterial({ color: 0x4ade80 });
+    const matPontoCD = new THREE.MeshBasicMaterial({ color: 0x818cf8 });
+    const matInterseccao = new THREE.MeshBasicMaterial({ color: 0xf87171 });
+
+    const randomPoints = new THREE.Group();
+    for (let i = 0; i < 45; i++) {
+        const pt = new THREE.Mesh(geoPonto, matPontoComum);
+        let px = (Math.random() - 0.5) * 16;
+        let py = (Math.random() - 0.5) * 14;
+        let pz = (Math.random() - 0.5) * 16;
+        if (Math.abs(py) < 1.5) py = (py >= 0 ? 1.5 : -1.5) + (Math.random() * 2);
+        pt.position.set(px, py, pz);
+        randomPoints.add(pt);
+    }
+    randomPoints.visible = false;
+    scene.add(randomPoints);
+
+    const p1 = new THREE.Mesh(geoPonto, matPontoPlano); p1.position.set(-4, 0, -3);
+    const p2 = new THREE.Mesh(geoPonto, matPontoPlano); p2.position.set(5, 0, -1);
+    const p3 = new THREE.Mesh(geoPonto, matPontoPlano); p3.position.set(1, 0, 5);
+    const planePoints = new THREE.Group();
+    planePoints.add(p1, p2, p3);
+    planePoints.visible = false;
+    scene.add(planePoints);
+
+    const planeGeo = new THREE.PlaneGeometry(18, 18);
+    const matPlane = new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide, transparent: true, opacity: 0 });
+    const plano = new THREE.Mesh(planeGeo, matPlane);
+    plano.rotation.x = -Math.PI / 2;
+    scene.add(plano);
+
+    function criarTextoSprite(texto) {
+        const canvas = document.createElement('canvas');
+        canvas.width = 300; canvas.height = 80;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 30px Segoe UI';
+        ctx.textAlign = 'center';
+        ctx.fillText(texto, 150, 50);
+        const tex = new THREE.CanvasTexture(canvas);
+        const spriteMat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0 });
+        const sprite = new THREE.Sprite(spriteMat);
+        sprite.scale.set(6, 1.6, 1);
+        return sprite;
+    }
+    
+    const spriteS1 = criarTextoSprite("Semi-espaço 1"); 
+    spriteS1.position.set(0, 5, 0); 
+    scene.add(spriteS1);
+    
+    const spriteS2 = criarTextoSprite("Semi-espaço 2"); 
+    spriteS2.position.set(0, -5, 0); 
+    scene.add(spriteS2);
+
+    const ptA = new THREE.Mesh(geoPonto, matPontoAB); ptA.position.set(-3, 4, -2);
+    const ptB = new THREE.Mesh(geoPonto, matPontoAB); ptB.position.set(4, 3, 2);
+    const matLineAB = new THREE.LineBasicMaterial({ color: 0x4ade80, transparent: true, opacity: 0, linewidth: 2 });
+    const lineAB = new THREE.Line(new THREE.BufferGeometry().setFromPoints([ptA.position, ptB.position]), matLineAB);
+    const groupAB = new THREE.Group(); 
+    groupAB.add(ptA, ptB, lineAB); 
+    groupAB.visible = false; 
+    scene.add(groupAB);
+
+    const ptC = new THREE.Mesh(geoPonto, matPontoCD); ptC.position.set(3, 5, -4);
+    const ptD = new THREE.Mesh(geoPonto, matPontoCD); ptD.position.set(-2, -4, 3);
+    const matLineCD = new THREE.LineBasicMaterial({ color: 0x818cf8, transparent: true, opacity: 0, linewidth: 2 });
+    const lineCD = new THREE.Line(new THREE.BufferGeometry().setFromPoints([ptC.position, ptD.position]), matLineCD);
+    
+    const dirVetor = new THREE.Vector3().subVectors(ptD.position, ptC.position);
+    const t = (0 - ptC.position.y) / dirVetor.y; 
+    const posIntersec = new THREE.Vector3().copy(ptC.position).addScaledVector(dirVetor, t);
+    
+    const ptInterseccao = new THREE.Mesh(new THREE.SphereGeometry(0.3, 16, 16), matInterseccao);
+    ptInterseccao.position.copy(posIntersec);
+    ptInterseccao.visible = false;
+    
+    const groupCD = new THREE.Group(); 
+    groupCD.add(ptC, ptD, lineCD, ptInterseccao); 
+    groupCD.visible = false; 
+    scene.add(groupCD);
+
+    let fase = 0;
+    let startTime = Date.now();
+
+    function render() {
+        currentAnimId = requestAnimationFrame(render);
+        const elapsed = (Date.now() - startTime) / 1000;
+
+        if (fase === 0 && elapsed > 1.5) {
+            randomPoints.visible = true;
+            status.innerText = "1. Considere a criação de vários pontos espalhados no espaço 3D...";
+            fase = 1;
+        }
+
+        if (fase === 1 && elapsed > 4.0) {
+            planePoints.visible = true;
+            status.innerText = "2. Construímos um plano a partir de três pontos não colineares.";
+            fase = 2;
+        }
+
+        if (fase === 2 && elapsed > 8.5) {
+            matPlane.opacity = 0.3;
+            spriteS1.material.opacity = 1;
+            spriteS2.material.opacity = 1;
+            status.innerText = "3. Esse plano divide o espaço em dois subconjuntos: os semi-espaços.";
+            fase = 3;
+        }
+
+        if (fase === 3 && elapsed > 13.0) {
+            groupAB.visible = true;
+            matLineAB.opacity = 1;
+            status.innerText = "4. Segmento AB, com extremos no MESMO semi-espaço (1), NÃO corta o plano.";
+            fase = 4;
+        }
+
+        if (fase === 4 && elapsed > 17.0) {
+            groupCD.visible = true;
+            matLineCD.opacity = 1;
+            status.innerText = "5. Já o segmento CD, com extremos em semi-espaços DIFERENTES...";
+            fase = 5;
+        }
+
+        if (fase === 5 && elapsed > 21.5) {
+            ptInterseccao.visible = true;
+            status.innerText = "6. ...inevitavelmente CORTA o plano. Arraste para explorar o cenário!";
+            controls.enabled = true;
+            fase = 6;
+        }
+
+        if (spriteS1.material.opacity > 0) {
+            spriteS1.position.y = 5 + Math.sin(elapsed * 2) * 0.2;
+            spriteS2.position.y = -5 - Math.sin(elapsed * 2) * 0.2;
+        }
+
+        controls.update();
+        renderer.render(scene, camera);
+    }
+    render();
+}
+    </script>
+</body>
+</html>

@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercícios - Laboratório de Geometria</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #38bdf8;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --success: #4ade80; 
+            --warning: #facc15;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- Interface Principal --- */
+        .header-top {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .btn-voltar-main {
+            background: transparent;
+            padding: 10px 15px;
+            color: var(--text-dim);
+            border: 1px solid #334155;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        h1 { color: var(--success); margin: 0 auto; transform: translateX(-45px); }
+
+        .bandeja-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .bandeja {
+            background: var(--card-bg);
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .conteudo-bandeja {
+            border: 2px dashed #334155;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .btn-animacao {
+            background: var(--accent);
+            color: #0f172a;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-animacao:hover { opacity: 0.9; }
+
+        /* --- TELA DE ANIMAÇÃO (OVERLAY) --- */
+        #tela-animacao {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: var(--bg-color);
+            z-index: 1000;
+            flex-direction: column;
+        }
+
+        #canvas-container {
+            flex-grow: 1;
+            width: 100%;
+            height: 100%;
+        }
+
+        .controles-anim {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1010;
+        }
+
+        .btn-controle {
+            background: #334155;
+            color: white;
+            border: 1px solid #475569;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-controle:hover { background: #475569; }
+
+        .btn-resposta {
+            background: var(--success);
+            color: #0f172a;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        #legenda-anim {
+            position: absolute;
+            bottom: 30px;
+            width: 100%;
+            text-align: center;
+            color: var(--text-main);
+            font-size: 1.2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
+            pointer-events: none;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        /* Modal de Resposta */
+        #modal-resposta {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            color: #0f172a;
+            padding: 25px 40px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            z-index: 1020;
+            font-weight: bold;
+            text-align: left;
+            max-width: 500px;
+        }
+        
+        #modal-resposta button {
+            margin-top: 15px;
+            background: var(--bg-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-top">
+        <a href="index_main.html" class="btn-voltar-main">← Voltar ao Laboratório</a>
+        <h1>Exercícios de Geometria do bloco C</h1>
+    </div>
+
+    <div class="bandeja-container">
+        <div class="bandeja">
+            <div>
+                <h2>Exercício 1</h2>
+                <div class="conteudo-bandeja">
+                  <p>
+                    <strong>Mostre que dois poliedros homotéticos possuem faces respectivamente paralelas.</strong>
+                  </p>
+                  <p>
+                    <strong> Passo 1: </strong> Construa um poliedro (tetraedro) original e escolha um centro de homotetia <strong>O</strong>;<br>
+                    <strong> Passo 2: </strong> Trace semirretas partindo de <strong>O</strong> e passando por cada vértice do tetraedro;<br>
+                    <strong> Passo 3: </strong> Projete os novos vértices multiplicando as distâncias por uma razão <strong>k</strong> para formar o novo poliedro;<br>
+                    <strong> Passo 4: </strong> Observe o paralelismo entre as faces correspondentes dos dois sólidos.<br>
+                  </p>
+                </div>
+            </div>
+            <button class="btn-animacao" onclick="abrirAnimacao(1)">Ver Animação</button>
+        </div>
+
+        <div class="bandeja">
+            <div>
+                <h2>Exercício 2</h2>
+                <div class="conteudo-bandeja">
+                    <p>
+                        <strong>Demonstre o seguinte teorema: sejam A, B e C pontos não colineares. Se as retas AB e AC são ortogonais à reta r, então BC também é ortogonal a r.</strong>
+                    </p>
+                    <p>
+                        <strong>Passo 1:</strong> Desenhe uma reta de referência <strong>r</strong> e defina três pontos não colineares A, B e C;<br>
+                        <strong>Passo 2:</strong> Trace os segmentos AB e AC, indicando que ambas as retas são ortogonais à reta <strong>r</strong>;<br>
+                        <strong>Passo 3:</strong> Visualize o plano determinado por A, B e C. Se <strong>r</strong> é ortogonal a duas retas concorrentes, é ortogonal ao plano;<br>
+                        <strong>Passo 4:</strong> Conclua que a reta BC, também contida no plano, obrigatoriamente é ortogonal a <strong>r</strong>.<br>
+                    </p>
+                </div>
+            </div>
+            <button class="btn-animacao" onclick="abrirAnimacao(2)">Ver Animação</button>
+        </div>
+    </div>
+
+    <div id="tela-animacao">
+        <div class="controles-anim">
+            <button class="btn-controle" onclick="fecharAnimacao()">← Voltar aos Exercícios</button>
+            <button class="btn-controle" onclick="reiniciarAnimacao()">Rever Animação</button>
+            <button class="btn-resposta" onclick="mostrarResposta()">Mostrar Prova</button>
+        </div>
+
+        <div id="modal-resposta" style="text-align: left;">
+            <p id="texto-resposta"></p>
+            <button onclick="document.getElementById('modal-resposta').style.display='none'">Fechar</button>
+        </div>
+
+        <div id="legenda-anim"></div>
+        <div id="canvas-container"></div>
+    </div>
+
+    <script>
+        let scene, camera, renderer, controls, currentAnimId;
+        let fase = 0, startTime = 0;
+        let objetosCena = [];
+        let exercicioAtual = 1;
+
+        function abrirAnimacao(id) {
+            exercicioAtual = id;
+            document.getElementById('tela-animacao').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            
+            initThree();
+            reiniciarAnimacao();
+            
+            cancelAnimationFrame(currentAnimId); 
+            animate();
+        }
+
+        function fecharAnimacao() {
+            document.getElementById('tela-animacao').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            cancelAnimationFrame(currentAnimId);
+            limparCena();
+        }
+
+        function mostrarResposta() {
+            const modal = document.getElementById('modal-resposta');
+            const texto = document.getElementById('texto-resposta');
+    
+            if (exercicioAtual === 1) {
+                texto.innerHTML = "<strong>Prova Geométrica:</strong><br><br>" +
+                                  "• Seja <strong>O</strong> o centro de homotetia e <strong>k</strong> a constante de razão.<br>" +
+                                  "• Para cada aresta <strong>AB</strong> do poliedro original, seus vértices correspondentes <strong>A'</strong> e <strong>B'</strong> satisfazem as relações OA'/OA = OB'/OB = k.<br>" +
+                                  "• Pelo teorema de Tales (ou semelhança de triângulos), a reta que contém <strong>A'B'</strong> é paralela à reta <strong>AB</strong>.<br>" +
+                                  "• Ao aplicar o mesmo conceito para os outros lados de uma face (como <strong>AC</strong> e <strong>A'C'</strong>), obtemos retas concorrentes respectivamente paralelas.<br>" +
+                                  "• Como dois planos determinados por pares de retas concorrentes e paralelas entre si são paralelos, concluímos que as faces homotéticas são <strong>paralelas</strong>.";
+            } else if (exercicioAtual === 2) {
+                texto.innerHTML = "<strong>Prova Geométrica:</strong><br><br>" +
+                                  "• Temos três pontos não colineares <strong>A, B e C</strong>, que, por definição, determinam um único plano <strong>α</strong>.<br>" +
+                                  "• O enunciado afirma que a reta <strong>r</strong> é ortogonal à reta <strong>AB</strong> e à reta <strong>AC</strong>.<br>" +
+                                  "• Sabemos pela geometria espacial que: se uma reta é ortogonal a duas retas concorrentes contidas em um plano, então ela é ortogonal a esse plano.<br>" +
+                                  "• Como as retas AB e AC são concorrentes (cruzam-se no ponto A) e determinam o plano α, concluímos que a reta <strong>r é ortogonal ao plano α</strong>.<br>" +
+                                  "• Por definição, uma reta ortogonal a um plano é ortogonal a <em>todas</em> as retas contidas nele.<br>" +
+                                  "• Como a reta <strong>BC</strong> está contida no plano α, conclui-se imediatamente que <strong>BC também é ortogonal à reta r</strong>.<br>" +
+                                  "• Este é o Teorema das Três Perpendiculares.";
+            }
+            modal.style.display = 'block';
+        }
+
+        function limparCena() {
+            objetosCena.forEach(obj => scene.remove(obj));
+            objetosCena = [];
+        }
+
+        function reiniciarAnimacao() {
+            limparCena();
+            fase = 0;
+            startTime = Date.now();
+            controls.enabled = false;
+            
+            if (exercicioAtual === 1) {
+                camera.position.set(10, 8, 14);
+            } else {
+                camera.position.set(8, 8, 12);
+            }
+            
+            document.getElementById('modal-resposta').style.display = 'none';
+            document.getElementById('legenda-anim').innerHTML = ""; 
+        }
+
+        function initThree() {
+            const container = document.getElementById('canvas-container');
+            if (renderer) return;
+
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            scene.add(new THREE.GridHelper(20, 20, 0x334155, 0x1e293b));
+        }
+
+        function animate() {
+            currentAnimId = requestAnimationFrame(animate);
+            const elapsed = (Date.now() - startTime) / 1000;
+            const legenda = document.getElementById('legenda-anim');
+
+            if (exercicioAtual === 1) {
+                // --- LÓGICA DO EXERCÍCIO 1 ---
+                const O = new THREE.Vector3(-4, -2, -2);
+                const A = new THREE.Vector3(-1, 2, 1);
+                const B = new THREE.Vector3(-2, -1, 3);
+                const C = new THREE.Vector3(1, -1, 2);
+                const D = new THREE.Vector3(-1, -1, 0);
+
+                const k = 2; 
+                const calcH = (pt) => new THREE.Vector3().subVectors(pt, O).multiplyScalar(k).add(O);
+                const Al = calcH(A), Bl = calcH(B), Cl = calcH(C), Dl = calcH(D);
+
+                if (fase === 0 && elapsed > 1) {
+                    adicionarPonto(O.x, O.y, O.z, 0xec4899, 'O');
+                    
+                    adicionarPonto(A.x, A.y, A.z, 0xffffff, 'A');
+                    adicionarPonto(B.x, B.y, B.z, 0xffffff, 'B');
+                    adicionarPonto(C.x, C.y, C.z, 0xffffff, 'C');
+                    adicionarPonto(D.x, D.y, D.z, 0xffffff, 'D');
+
+                    adicionarRetaVec(A, B, 0x94a3b8); adicionarRetaVec(A, C, 0x94a3b8);
+                    adicionarRetaVec(A, D, 0x94a3b8); adicionarRetaVec(B, C, 0x94a3b8);
+                    adicionarRetaVec(B, D, 0x94a3b8); adicionarRetaVec(C, D, 0x94a3b8);
+
+                    legenda.innerHTML = "<span style='color: #ffffff; font-weight: bold;'>1.</span> Criamos um poliedro (ABCD) e definimos o centro de homotetia <span style='color:#ec4899;'>O</span>.";
+                    fase = 1;
+                }
+                if (fase === 1 && elapsed > 4) {
+                    adicionarRetaVec(O, calcH(A).multiplyScalar(1.2), 0x475569);
+                    adicionarRetaVec(O, calcH(B).multiplyScalar(1.2), 0x475569);
+                    adicionarRetaVec(O, calcH(C).multiplyScalar(1.2), 0x475569);
+                    adicionarRetaVec(O, calcH(D).multiplyScalar(1.2), 0x475569);
+
+                    legenda.innerHTML = "<span style='color: #94a3b8; font-weight: bold;'>2.</span> Traçamos as linhas de projeção a partir do centro O passando pelos vértices.";
+                    fase = 2;
+                }
+                if (fase === 2 && elapsed > 7) {
+                    adicionarPonto(Al.x, Al.y, Al.z, 0x38bdf8, "A'");
+                    adicionarPonto(Bl.x, Bl.y, Bl.z, 0x38bdf8, "B'");
+                    adicionarPonto(Cl.x, Cl.y, Cl.z, 0x38bdf8, "C'");
+                    adicionarPonto(Dl.x, Dl.y, Dl.z, 0x38bdf8, "D'");
+
+                    adicionarRetaVec(Al, Bl, 0x38bdf8); adicionarRetaVec(Al, Cl, 0x38bdf8);
+                    adicionarRetaVec(Al, Dl, 0x38bdf8); adicionarRetaVec(Bl, Cl, 0x38bdf8);
+                    adicionarRetaVec(Bl, Dl, 0x38bdf8); adicionarRetaVec(Cl, Dl, 0x38bdf8);
+
+                    legenda.innerHTML = "<span style='color: #38bdf8; font-weight: bold;'>3.</span> Formamos o poliedro homotético A'B'C'D' projetado pela razão k.";
+                    fase = 3;
+                }
+                if (fase === 3 && elapsed > 11) {
+                    adicionarPlano([A.x, A.y, A.z], [B.x, B.y, B.z], [C.x, C.y, C.z], 0x4ade80, 0.6);
+                    adicionarPlano([Al.x, Al.y, Al.z], [Bl.x, Bl.y, Bl.z], [Cl.x, Cl.y, Cl.z], 0x4ade80, 0.6);
+
+                    legenda.innerHTML = "<span style='color: #4ade80; font-weight: bold;'>4.</span> Note que a face verde original é paralela à sua correspondente! Gire para verificar.";
+                    controls.enabled = true;
+                    fase = 4;
+                }
+
+            } else if (exercicioAtual === 2) {
+                // --- LÓGICA DO EXERCÍCIO 2 ---
+                
+                // Reta r (vertical ao longo do eixo Y)
+                const R1 = new THREE.Vector3(-3, -5, 0);
+                const R2 = new THREE.Vector3(-3, 5, 0);
+
+                // Pontos A, B, C contidos em um plano paralelo a XZ (ortogonal ao eixo Y/reta r)
+                // A altura escolhida foi y = 0 para simular a ortogonalidade
+                const A = new THREE.Vector3(0, 0, 0);
+                const B = new THREE.Vector3(4, 0, 2);
+                const C = new THREE.Vector3(2, 0, -4);
+
+                if (fase === 0 && elapsed > 1) {
+                    // Desenhar a reta r e os pontos
+                    adicionarRetaVec(R1, R2, 0xec4899);
+                    criarLabel('r', R2.x, R2.y + 0.5, R2.z, '#ec4899');
+
+                    adicionarPonto(A.x, A.y, A.z, 0xffffff, 'A');
+                    adicionarPonto(B.x, B.y, B.z, 0xffffff, 'B');
+                    adicionarPonto(C.x, C.y, C.z, 0xffffff, 'C');
+
+                    legenda.innerHTML = "<span style='color:#ffffff; font-weight:bold;'>1.</span> Definimos a reta <span style='color:#ec4899;'>r</span> e três pontos não colineares A, B e C.";
+                    fase = 1;
+                }
+                if (fase === 1 && elapsed > 4) {
+                    adicionarRetaVec(A, B, 0x38bdf8);
+                    adicionarRetaVec(A, C, 0x38bdf8);
+
+                    legenda.innerHTML = "<span style='color:#38bdf8; font-weight:bold;'>2.</span> As retas AB e AC cruzam-se e são ambas ortogonais à reta r.";
+                    fase = 2;
+                }
+                if (fase === 2 && elapsed > 7) {
+                    adicionarPlano([A.x, A.y, A.z], [B.x, B.y, B.z], [C.x, C.y, C.z], 0x4ade80, 0.4);
+
+                    legenda.innerHTML = "<span style='color:#4ade80; font-weight:bold;'>3.</span> Sendo ortogonal a duas retas concorrentes do plano ABC, r é ortogonal a todo o plano.";
+                    fase = 3;
+                }
+                if (fase === 3 && elapsed > 11) {
+                    adicionarRetaVec(B, C, 0xfacc15);
+
+                    legenda.innerHTML = "<span style='color:#facc15; font-weight:bold;'>4.</span> Portanto, qualquer reta do plano, inclusive BC, é ortogonal a r! Gire a cena.";
+                    controls.enabled = true;
+                    fase = 4;
+                }
+            }
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        /* --- Funções Auxiliares de Geometria --- */
+        function criarLabel(texto, x, y, z, corTextHex) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128;
+            canvas.height = 128;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.font = 'bold 50px Arial';
+            ctx.fillStyle = corTextHex;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = "rgba(0,0,0,0.8)";
+            ctx.shadowBlur = 4;
+            ctx.fillText(texto, 64, 64);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            const material = new THREE.SpriteMaterial({ map: texture, depthTest: false });
+            const sprite = new THREE.Sprite(material);
+            
+            sprite.position.set(x, y, z);
+            sprite.scale.set(1.5, 1.5, 1.5);
+            sprite.renderOrder = 999; 
+            
+            scene.add(sprite);
+            objetosCena.push(sprite);
+        }
+
+        function adicionarPonto(x, y, z, cor, nome = '') {
+            const p = new THREE.Mesh(new THREE.SphereGeometry(0.18), new THREE.MeshBasicMaterial({color: cor}));
+            p.position.set(x, y, z);
+            scene.add(p);
+            objetosCena.push(p);
+
+            if (nome !== '') {
+                const hexColor = '#' + cor.toString(16).padStart(6, '0');
+                criarLabel(nome, x, y + 0.5, z, hexColor);
+            }
+        }
+
+        function adicionarReta(x1, y1, z1, x2, y2, z2, cor = 0x94a3b8) {
+            const mat = new THREE.LineBasicMaterial({color: cor, linewidth: 2});
+            const geo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(x1,y1,z1), new THREE.Vector3(x2,y2,z2)]);
+            const line = new THREE.Line(geo, mat);
+            scene.add(line);
+            objetosCena.push(line);
+        }
+
+        function adicionarRetaVec(v1, v2, cor = 0x94a3b8) {
+            adicionarReta(v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, cor);
+        }
+
+        function adicionarPlano(p1, p2, p3, cor, opacidade = 0.5) {
+            const geom = new THREE.BufferGeometry();
+            const vertices = new Float32Array([...p1, ...p2, ...p3]);
+            geom.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+            const mat = new THREE.MeshBasicMaterial({color: cor, side: THREE.DoubleSide, transparent: true, opacity: opacidade, depthWrite: false});
+            const mesh = new THREE.Mesh(geom, mat);
+            scene.add(mesh);
+            objetosCena.push(mesh);
+        }
+
+        window.addEventListener('resize', () => {
+            if (camera) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        });
+    </script>
+</body>
+</html>
