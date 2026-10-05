@@ -281,18 +281,20 @@
     
             if (exercicioAtual === 1) {
                 texto.innerHTML = "<strong>Prova Geométrica:</strong><br><br>" +
-                                  "• Seja <strong>i</strong> a reta de interseção entre os planos &alpha; e &beta;.<br>" +
-                                  "• Como a reta <strong>r</strong> é paralela a &alpha;, se passarmos um plano por <strong>r</strong> que intercepte &alpha;, a interseção será paralela a <strong>r</strong>.<br>" +
-                                  "• O mesmo vale para &beta;.<br>" +
-                                  "• Se supusermos por absurdo que <strong>r</strong> não é paralela a <strong>i</strong>, então as retas de intersecção dos planos traçados por <strong>r</strong> e os planos &alpha; e &beta; também não são paralelas  a <strong>i</strong>. Logo, estas retas de intersecção cruzam a reta <strong>i</strong> e acabariam perfurando pelo menos um dos planos, o que contradiz a premissa de que <strong>r</strong> é paralela a ambos os planos.<br>" +
-                                  "• Portanto, <strong>r</strong> // <strong>i</strong>.";
+                    "• Sejam &alpha; e &beta; planos secantes cuja interseção é a reta <strong>i</strong>, e <strong>r</strong> uma reta tal que <strong>r</strong> &parallel; &alpha; e <strong>r</strong> &parallel; &beta;.<br>" +
+                    "• Tome P &isin; <strong>i</strong>. Como <strong>r</strong> &parallel; &alpha;, sabemos que P &notin; <strong>r</strong>. Logo, P e <strong>r</strong> determinam um único plano &pi;.<br>" +
+                    "• Como P &isin; &alpha; &cap; &pi;, &pi; intercepta &alpha; na reta <strong>s</strong> passando por P. Sendo <strong>s</strong> &sub; &alpha;, <strong>r</strong> &sub; &pi; e <strong>r</strong> &parallel; &alpha;, <strong>r</strong> não intercepta <strong>s</strong>, porém r e s são coplanares em &pi;. Assim, conclui-se <strong>r</strong> &parallel; <strong>s</strong>.<br>" +
+                    "• De forma análoga, &pi; intercepta &beta; numa reta <strong>t</strong> passando por P, tal que <strong>r</strong> &parallel; <strong>t</strong>.<br>" +
+                    "• Em &pi;, <strong>s</strong> e <strong>t</strong> passam por P e são paralelas a <strong>r</strong>. Pelo Postulado das Paralelas, <strong>s</strong> e <strong>t</strong> coincidem (<strong>s</strong> = <strong>t</strong>).<br>" +
+                    "• Como <strong>s</strong> &sub; &alpha; e <strong>t</strong> &sub; &beta;, <strong>s</strong> = <strong>t</strong> implica que a reta pertence a ambos os planos. Portanto, coincide com a interseção original: <strong>s</strong> = <strong>i</strong>.<br>" +
+                    "• Como <strong>r</strong> &parallel; <strong>s</strong> e <strong>s</strong> = <strong>i</strong>, conclui-se que <strong>r</strong> &parallel; <strong>i</strong>. &#8718;";
             } else if (exercicioAtual === 2) {
                 texto.innerHTML = "<strong>Prova Geométrica:</strong><br><br>" +
-                                  "• Seja o plano &pi; secante ao tetraedro e paralelo a AC e BD.<br>" +
-                                  "• A interseção de &pi; com a face ABC forma o segmento PQ. Como &pi; // AC, temos que <strong>PQ // AC</strong>.<br>" +
-                                  "• A interseção de &pi; com a face ADC forma o segmento SR. Pelo mesmo motivo, <strong>SR // AC</strong>. Logo, <strong>PQ // SR</strong>.<br>" +
-                                  "• Aplicando o mesmo raciocínio para as faces ABD e BDC em relação à aresta BD, obtemos que <strong>PS // BD</strong> e <strong>QR // BD</strong>. Logo, <strong>PS // QR</strong>.<br>" +
-                                  "• Um quadrilátero com pares de lados opostos paralelos é, por definição, um <strong>paralelogramo</strong>.";
+                    "• Seja o plano &pi; secante ao tetraedro ABCD, passando pelo ponto P da aresta AB e paralelo às arestas AC e BD.<br>" +
+                    "• A interseção de &pi; com a face ABC determina o segmento PQ, em que Q pertence à aresta BC. Como PQ está contido em &pi; e &pi; &parallel; AC, temos que PQ &parallel; AC.<br>" +
+                    "• Analogamente, a interseção de &pi; com a face ADC determina o segmento SR, em que S pertence à aresta AD e R pertence à aresta CD. Como AC pertence ao plano da face ADC e é paralela a &pi;, temos SR &parallel; AC. Consequentemente, PQ &parallel; SR.<br>" +
+                    "• Aplicando o mesmo raciocínio para as faces ABD e BDC em relação à aresta BD, obtemos que PS &parallel; BD e QR &parallel; BD. Logo, PS &parallel; QR.<br>" +
+                    "• Assim, temos que a seção formada pela interseção do plano &pi; com o tetraedro é o quadrilátero PQRS com pares de lados opostos paralelos. Portanto, pela definição de paralelogramo, concluímos que PQRS é um paralelogramo. &#8718;";
             }
             modal.style.display = 'block';
         }
