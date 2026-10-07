@@ -281,11 +281,12 @@
             } else if (exercicioAtual === 2) {
                 texto.innerHTML = "<strong>Resposta:</strong> A interseção é a reta AB.<br><br>" +
                           "<strong>Justificativa:</strong><br><br>" +
-                          "• Como A pertence a r, e r está contida em &alpha;, o ponto A pertence a &alpha;.<br>" +
-                          "• Como A também define o plano &beta;, o ponto A pertence a &beta;.<br>" +
-                          "• Aplicando o mesmo raciocínio ao ponto B, temos que B pertence a &alpha; e a &beta;.<br>" +
+                          "• Como A &isin; r e r está contida em &alpha;, então o ponto A &isin; &alpha;.<br>" +
+                          "• Como o plano &beta; é definido pela reta s e pelo ponto A, então o ponto A &isin; &beta;.<br>" +
+                          "• Como B &isin; s e s está contida em &beta; então B &isin; &beta;. Além disso pela definição de &alpha;, temos que B &isin; &alpha;<br>" +
+                          "• Como r e s são retas reversas, elas não possuem ponto em comum, portanto A &ne; B.<br>" +
                           "• Como dois pontos distintos pertencem simultaneamente a ambos os planos, " +
-                          "a interseção é, necessariamente, a reta definida por eles.";
+                          "a interseção dos planos é, necessariamente, a reta definida por eles.";
     }
     
     modal.style.display = 'block';
